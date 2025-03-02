@@ -14,8 +14,19 @@ export const useTrainsStore = defineStore(
       searchMethod: "time",
     });
 
-    const searchResults = ref([]);
+    const selectedTrain = reactive({
+      tripType: "",
+      trainDate: "",
+      trainNumber: "",
+      depStation: "",
+      arrStation: "",
+      depTime: "",
+      arrTime: "",
+      durationTime: "",
+      price: 0,
+    });
 
+    const searchResults = ref([]);
     const departureStationName = ref("");
     const arrivalStationName = ref("");
 
@@ -60,6 +71,7 @@ export const useTrainsStore = defineStore(
       arrivalStationName,
       setSearchParams,
       findTrains,
+      selectedTrain,
     };
   },
   {

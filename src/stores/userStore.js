@@ -31,6 +31,15 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
+  const sendOtp = async (email) => {
+    try {
+      const res = await UserService.sendOtp(email);
+      return res;
+    } catch (e) {
+      throw e;
+    }
+  };
+
   const logout = () => {
     token.value = null;
     userId.value = null;
@@ -45,5 +54,6 @@ export const useUserStore = defineStore("user", () => {
     register,
     isLoggedIn,
     logout,
+    sendOtp,
   };
 });

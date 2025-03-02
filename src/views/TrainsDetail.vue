@@ -1,10 +1,13 @@
 <template>
   <Stepper></Stepper>
-  <div class="d-flex justify-content-center mt-4 mb-4">
+  <div class="d-flex justify-content-center my-4">
     <div class="card shadow" style="width: 850px">
       <div class="card-body">
         <h5 class="card-title mt-3">
-          去程： ({{ trainsStore.departureStationName }} →
+          <span v-if="searchParams.depStation > searchParams.arrStation"
+            >去程</span
+          >
+          <span v-else>回程</span>： ({{ trainsStore.departureStationName }} →
           {{ trainsStore.arrivalStationName }})
         </h5>
         <p class="card-subtitle text-muted mt-3 mb-2">
@@ -72,6 +75,7 @@ import TicketPreview from "@/components/TicketPreview.vue";
 import Stepper from "@/components/Stepper.vue";
 
 const trainsStore = useTrainsStore();
+const { searchParams } = trainsStore;
 const selectedTrain = ref("");
 
 const formattedTrainDate = computed(() => {

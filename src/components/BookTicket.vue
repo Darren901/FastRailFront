@@ -1,7 +1,7 @@
 <template>
   <div
     class="container bg-light position-relative"
-    style="min-height: 450px; margin-top: -10rem; z-index: 1"
+    style="min-height: 450px; margin-top: -20rem; z-index: 1"
   >
     <div class="d-flex pt-3 px-3">
       <h3 class="text-primary">預定高鐵車票</h3>

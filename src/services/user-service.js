@@ -15,6 +15,10 @@ export const UserService = {
       name: data.name,
       phone: data.phone,
       twId: data.twId,
+      otp: data.otp,
     });
+  },
+  sendOtp(email) {
+    return axios.post(`${API_URL}/send-otp`, { email });
   },
 };

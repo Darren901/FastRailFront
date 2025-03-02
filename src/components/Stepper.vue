@@ -5,9 +5,23 @@
       <span class="text-muted mx-3">—</span>
       <span>2. 選擇車次</span>
       <span class="text-muted mx-3">—</span>
-      <span class="text-muted">3. 取票資訊</span>
+      <span
+        :class="{
+          'text-muted': !['confirm', 'order'].includes(props.currentPage),
+        }"
+        >3. 取票資訊</span
+      >
       <span class="text-muted mx-3">—</span>
-      <span class="text-muted">4. 完成訂位</span>
+      <span :class="{ 'text-muted': props.currentPage !== 'order' }"
+        >4. 完成訂位</span
+      >
     </div>
   </div>
 </template>
+<script setup>
+const props = defineProps({
+  currentPage: {
+    type: String,
+  },
+});
+</script>

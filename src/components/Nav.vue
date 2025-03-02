@@ -31,10 +31,16 @@
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">車次查詢</a>
+            <a class="nav-link" href="#">訂票須知</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">訂票須知</a>
+            <RouterLink
+              v-if="userStore.isLoggedIn"
+              to="/my-tickets"
+              class="nav-link"
+              href="#"
+              >我的車票</RouterLink
+            >
           </li>
           <li v-if="userStore.isLoggedIn" class="nav-item">
             <a class="nav-link" href="#" @click="userStore.logout">登出</a>

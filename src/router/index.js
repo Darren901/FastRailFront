@@ -23,6 +23,31 @@ const router = createRouter({
       name: "TrainsDetail",
       component: () => import("@/views/TrainsDetail.vue"),
     },
+    {
+      path: "/confirm",
+      name: "ConfirmTicket",
+      component: () => import("@/views/ConfirmTicket.vue"),
+    },
+    {
+      path: "/order/:orderNumber",
+      name: "OrderSuccess",
+      component: () => import("@/views/OrderSuccess.vue"),
+    },
+    {
+      path: "/my-tickets",
+      name: "MyTickets",
+      component: () => import("@/views/MyTicket.vue"),
+    },
+    {
+      path: "/google-callback",
+      name: "GoogleCallback",
+      component: () => import("@/views/GoogleCallback.vue"),
+    },
+    {
+      path: "/complete-google-register",
+      name: "CompleteGoogleRegister",
+      component: () => import("@/views/CompleteGoogleRegister.vue"),
+    },
   ],
 });
 

@@ -3,19 +3,19 @@
     <footer class="py-3 my-4">
       <ul class="nav justify-content-center border-top pb-3 mb-3">
         <li class="nav-item">
-          <a href="#" class="nav-link px-2 text-muted">Home</a>
+          <a href="#" class="nav-link px-2 text-muted">常見問題</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link px-2 text-muted">Features</a>
+          <a href="#" class="nav-link px-2 text-muted">交易注意事項</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link px-2 text-muted">Pricing</a>
+          <a href="#" class="nav-link px-2 text-muted">個人資料保護專區</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link px-2 text-muted">FAQs</a>
+          <a href="#" class="nav-link px-2 text-muted">網路訂票說明</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link px-2 text-muted">About</a>
+          <a href="#" class="nav-link px-2 text-muted">企業網站</a>
         </li>
       </ul>
       <p class="text-center text-body-secondary">

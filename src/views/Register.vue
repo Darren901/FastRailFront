@@ -62,6 +62,39 @@
           v-model="register.phone"
         />
       </div>
+      <div class="mb-3 w-100">
+        <label for="email-verification " class="form-label"
+          ><span class="text-success">OTP驗證</span></label
+        >
+        <div class="d-flex gap-3">
+          <input
+            type="text"
+            class="form-control"
+            id="email-verification"
+            placeholder="請輸入四位驗證碼"
+            v-model="register.otp"
+          />
+          <button
+            class="btn"
+            :class="[
+              isCountingDown ? 'btn-primary text-light' : 'btn-outline-primary',
+            ]"
+            @click="handleSendOtp"
+            :disabled="isCountingDown || showOtpSpinner"
+          >
+            <span style="text-wrap: nowrap"
+              >{{ buttonText }}
+              <div
+                v-if="showOtpSpinner"
+                class="spinner-border spinner-border-sm text-primary"
+                role="status"
+              >
+                <span class="visually-hidden">Loading...</span>
+              </div></span
+            >
+          </button>
+        </div>
+      </div>
       <div class="d-flex justify-content-between w-100">
         <p>
           已經有帳號了？<RouterLink to="login" class="text-primary"
@@ -80,7 +113,7 @@
 </template>
 <script setup>
 import { useUserStore } from "@/stores/userStore";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const register = reactive({
@@ -89,24 +122,106 @@ const register = reactive({
   name: "",
   twId: "",
   phone: "",
+  otp: "",
 });
+
+const isCountingDown = ref(false);
+const countdown = ref(10); // 10秒倒計時
+const buttonText = ref("發送驗證碼");
+const showOtpSpinner = ref(false);
 
 const userStore = useUserStore();
 const router = useRouter();
+
 const handleRegister = async () => {
-  const success = await userStore.register(register);
-  if (success) {
-    router.push("/login");
+  try {
+    const success = await userStore.register(register);
+    if (success) {
+      router.push("/login");
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        iconColor: "black",
+        title: `註冊成功！`,
+        timer: 2500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+    }
+  } catch (e) {
     Swal.fire({
       toast: true,
       position: "top-end",
-      icon: "success",
-      iconColor: "black",
-      title: `註冊成功！`,
+      icon: "error",
+      title: e.response.data.message || "註冊失敗",
       timer: 2500,
       showConfirmButton: false,
       timerProgressBar: true,
     });
   }
+};
+
+const handleSendOtp = async () => {
+  if (isCountingDown.value) return;
+
+  if (!register.email) {
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "error",
+      title: "請先填寫Email",
+      timer: 2500,
+      showConfirmButton: false,
+      timerProgressBar: true,
+    });
+    return;
+  }
+
+  try {
+    showOtpSpinner.value = true;
+    const res = await userStore.sendOtp(register.email);
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      iconColor: "black",
+      title: res.data.message,
+      timer: 2500,
+      showConfirmButton: false,
+      timerProgressBar: true,
+    });
+
+    startCountdown();
+  } catch (e) {
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "error",
+      title: e.response.data.message || "傳送驗證碼發生錯誤",
+      timer: 2500,
+      showConfirmButton: false,
+      timerProgressBar: true,
+    });
+  } finally {
+    showOtpSpinner.value = false;
+  }
+};
+
+const startCountdown = () => {
+  isCountingDown.value = true;
+  countdown.value = 10;
+  buttonText.value = `已發送(${countdown.value})`;
+
+  const timer = setInterval(() => {
+    countdown.value--;
+    buttonText.value = `已發送(${countdown.value})`;
+
+    if (countdown.value <= 0) {
+      clearInterval(timer);
+      isCountingDown.value = false;
+      buttonText.value = "發送驗證碼";
+    }
+  }, 1000);
 };
 </script>

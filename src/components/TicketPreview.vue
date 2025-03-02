@@ -16,7 +16,9 @@
               <div class="card-body">
                 <div class="d-flex justify-content-between">
                   <p class="text-muted">
-                    <span class="badge bg-black me-1 fs-6 px-1">去程</span
+                    <span class="badge bg-black me-1 fs-6 px-1">{{
+                      tripType
+                    }}</span
                     >{{ trainInfo.trainDate }}
                   </p>
                   <div class="d-flex">
@@ -58,7 +60,10 @@
             </div>
           </div>
         </div>
-        <button class="btn btn-primary text-light w-100 mt-5 py-3">
+        <button
+          @click="confirmTrain"
+          class="btn btn-primary text-light w-100 mt-5 py-3"
+        >
           確認車次
         </button>
       </div>
@@ -68,8 +73,11 @@
 <script setup>
 import { useTrainsStore } from "@/stores/trainsStore";
 import { defineProps, computed } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const trainStore = useTrainsStore();
+const { searchParams } = trainStore;
 
 const props = defineProps({
   selectedTrain: {
@@ -90,9 +98,27 @@ const trainInfo = computed(() => {
   };
 });
 
+const tripType = computed(() => {
+  return searchParams.depStation > searchParams.arrStation ? "去程" : "回程";
+});
+
 const formatTrainDate = (date) => {
   if (!date) return "";
   const [year, month, day] = date?.split("-");
   return `${parseInt(month)}/${parseInt(day)}`;
+};
+
+const confirmTrain = () => {
+  trainStore.selectedTrain.tripType = tripType.value;
+  trainStore.selectedTrain.trainDate = trainInfo.value.trainDate;
+  trainStore.selectedTrain.trainNumber = trainInfo.value.trainNumber;
+  trainStore.selectedTrain.depStation = trainStore.departureStationName;
+  trainStore.selectedTrain.arrStation = trainStore.arrivalStationName;
+  trainStore.selectedTrain.depTime = trainInfo.value.departureTime;
+  trainStore.selectedTrain.arrTime = trainInfo.value.arrivalTime;
+  trainStore.selectedTrain.durationTime = trainInfo.value.durationTime;
+  trainStore.selectedTrain.price =
+    Math.abs(searchParams.arrStation - searchParams.depStation) * 120;
+  router.push("/confirm");
 };
 </script>

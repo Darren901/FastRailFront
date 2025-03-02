@@ -9,7 +9,7 @@
 
 <style scoped>
 .title-img {
-  background-image: url("images/rail.jpg");
+  background-image: url("images/rail2.jpg");
   top: 0;
   left: 0;
   height: 100%;
