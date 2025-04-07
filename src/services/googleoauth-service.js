@@ -5,11 +5,4 @@ export const GoogleService = {
   login() {
     return axios.get(`${API_URL}/login`);
   },
-  handleCallback(code, state) {
-    return axios.get(`${API_URL}?code=${code}&state=${state}`);
-  },
-
-  completeRegistration(data) {
-    return axios.post("${API_URL}/complete-registration", data);
-  },
 };

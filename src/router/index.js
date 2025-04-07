@@ -38,16 +38,6 @@ const router = createRouter({
       name: "MyTickets",
       component: () => import("@/views/MyTicket.vue"),
     },
-    {
-      path: "/google-callback",
-      name: "GoogleCallback",
-      component: () => import("@/views/GoogleCallback.vue"),
-    },
-    {
-      path: "/complete-google-register",
-      name: "CompleteGoogleRegister",
-      component: () => import("@/views/CompleteGoogleRegister.vue"),
-    },
   ],
 });
 
