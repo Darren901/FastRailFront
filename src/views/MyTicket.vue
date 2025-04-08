@@ -30,15 +30,11 @@
       v-if="orderStore.ticketStatus === 'PAID'"
       v-for="order in orderStore.paidOrders"
     >
-      <Ticket :order="order" @open-modal="handleOpenModel"></Ticket>
+      <Ticket :order="order"></Ticket>
     </div>
     <div v-else v-for="order in orderStore.pendingOrders">
-      <Ticket :order="order" @open-modal="handleOpenModel"></Ticket>
+      <Ticket :order="order"></Ticket>
     </div>
-    <GetTicketModal
-      ref="ticketModal"
-      @payOrder="handlePayOrder"
-    ></GetTicketModal>
   </div>
   <div v-else>
     <h2 class="d-flex justify-content-center text-muted mt-5">請先登入會員</h2>
@@ -46,11 +42,10 @@
 </template>
 
 <script setup>
-import GetTicketModal from "@/components/GetTicketModal.vue";
 import Ticket from "@/components/Ticket.vue";
 import { useOrderStore } from "@/stores/orderStore";
 import { useUserStore } from "@/stores/userStore";
-import { ref, watch } from "vue";
+import { watch } from "vue";
 
 const orderStore = useOrderStore();
 const userStore = useUserStore();
@@ -77,43 +72,6 @@ watch(
   () => orderStore.ticketStatus,
   () => getOrders()
 );
-
-const ticketModal = ref(null);
-const currentOrderNumber = ref(null);
-const handleOpenModel = (orderNumber) => {
-  currentOrderNumber.value = orderNumber;
-  ticketModal.value.showModal();
-};
-
-const handlePayOrder = async (twId) => {
-  try {
-    const success = await orderStore.payOrder(currentOrderNumber.value, twId);
-    if (success) {
-      Swal.fire({
-        toast: true,
-        position: "top-end",
-        icon: "success",
-        iconColor: "black",
-        title: "付款成功",
-        timer: 2500,
-        showConfirmButton: false,
-        timerProgressBar: true,
-      });
-    }
-  } catch (e) {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "error",
-      title: e.response.data.message || "付款發生錯誤",
-      timer: 2500,
-      showConfirmButton: false,
-      timerProgressBar: true,
-    });
-  } finally {
-    ticketModal.value.hideModal();
-  }
-};
 </script>
 
 <style scoped>

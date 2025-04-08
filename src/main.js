@@ -6,6 +6,10 @@ import router from "./router";
 import Swal from "sweetalert2";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import PrimeVue from "primevue/config";
+import "primevue/resources/themes/saga-blue/theme.css";
+import "primevue/resources/primevue.min.css";
+import "primeicons/primeicons.css";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -14,6 +18,7 @@ pinia.use(piniaPluginPersistedstate);
 
 app.use(pinia);
 app.use(router);
+app.use(PrimeVue);
 window.Swal = Swal;
 
 app.mount("#app");

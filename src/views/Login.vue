@@ -76,18 +76,25 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
 import { GoogleService } from "@/services/googleoauth-service";
+
 const userStore = useUserStore();
+const router = useRouter();
+
+onMounted(() => {
+  if (userStore.isLoggedIn) {
+    router.push("/");
+  }
+});
 
 const login = ref({
   email: "",
   password: "",
 });
 
-const router = useRouter();
 const handleLogin = async () => {
   try {
     const success = await userStore.login(

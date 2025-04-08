@@ -38,6 +38,16 @@ const router = createRouter({
       name: "MyTickets",
       component: () => import("@/views/MyTicket.vue"),
     },
+    {
+      path: "/auth-callback",
+      name: "AuthCallback",
+      component: () => import("@/views/AuthCallback.vue"),
+    },
+    {
+      path: "/complete-profile",
+      name: "CompleteProfile",
+      component: () => import("@/views/CompleteProfile.vue"),
+    },
   ],
 });
 

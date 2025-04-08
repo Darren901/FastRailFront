@@ -12,9 +12,10 @@
 import Stepper from "@/components/Stepper.vue";
 import Ticket from "@/components/Ticket.vue";
 import { useOrderStore } from "@/stores/orderStore";
-import { useRoute } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
-const route = useRoute();
+const router = useRouter();
+const route = useRoute()
 const orderStore = useOrderStore();
 const getOrder = async () => {
   try {
@@ -29,6 +30,7 @@ const getOrder = async () => {
       showConfirmButton: false,
       timerProgressBar: true,
     });
+    router.push("/")
   }
 };
 

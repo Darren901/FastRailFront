@@ -5,4 +5,7 @@ export const GoogleService = {
   login() {
     return axios.get(`${API_URL}/login`);
   },
+  completeRegistration: (data) => {
+    return axios.post(`${API_URL}/complete-registration`, data);
+  },
 };

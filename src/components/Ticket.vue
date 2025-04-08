@@ -18,15 +18,25 @@
         <div class="row">
           <div class="col-md-8">
             <div class="border-bottom pb-3 mb-3">
-              <div class="d-flex align-items-center mb-2">
-                <span class="badge bg-dark me-2">
-                  {{ props.order.tripType }}
-                </span>
-                <p class="mb-0 text-muted">
-                  {{ formatTrainDate(props.order.trainDate).year }}/{{
-                    formatTrainDate(props.order.trainDate).month
-                  }}/{{ formatTrainDate(props.order.trainDate).day }}
-                </p>
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <div class="d-flex">
+                  <span class="badge bg-dark me-2">
+                    {{ props.order.tripType }}
+                  </span>
+                  <p class="mb-0 text-muted">
+                    {{ formatTrainDate(props.order.trainDate).year }}/{{
+                      formatTrainDate(props.order.trainDate).month
+                    }}/{{ formatTrainDate(props.order.trainDate).day }}
+                  </p>
+                </div>
+                <span
+                  class="text-primary fw-bold"
+                  style="cursor: pointer"
+                  @click="openStopsModal"
+                  >停靠站</span
+                >
               </div>
 
               <div class="d-flex align-items-center">
@@ -90,7 +100,7 @@
                 <button
                   v-if="props.order.orderStatus === 'PENDING'"
                   class="btn btn-outline-primary btn-sm ms-3"
-                  @click="$emit('open-modal', props.order.orderNumber)"
+                  @click="openGetTicketModel"
                 >
                   <span class="small">付款並取票</span>
                 </button>
@@ -113,10 +123,105 @@
       </div>
     </div>
   </div>
+  <TrainStopsModal ref="stopsRef"></TrainStopsModal>
+  <GetTicketModal ref="ticketModal" @payOrder="handlePayOrder"></GetTicketModal>
 </template>
 
 <script setup>
-import { defineProps } from "vue";
+import GetTicketModal from "@/components/GetTicketModal.vue";
+import { defineProps, ref } from "vue";
+import TrainStopsModal from "./TrainStopsModal.vue";
+import { useOrderStore } from "@/stores/orderStore";
+
+const orderStore = useOrderStore();
+
+const ticketModal = ref(null);
+const openGetTicketModel = () => {
+  ticketModal.value.showModal();
+};
+
+const handlePayOrder = async (twId) => {
+  try {
+    const success = await orderStore.payOrder(props.order.orderNumber, twId);
+    if (success) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        iconColor: "black",
+        title: "付款成功",
+        timer: 2500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+      orderStore.ticketStatus = "PAID";
+    }
+  } catch (e) {
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "error",
+      title: e.response.data.message || "付款發生錯誤",
+      timer: 2500,
+      showConfirmButton: false,
+      timerProgressBar: true,
+    });
+  } finally {
+    ticketModal.value.hideModal();
+  }
+};
+
+const stopsRef = ref();
+const openStopsModal = () => {
+  stopsRef.value.showModal();
+  stopsRef.value.trainNumber = props.order.trainNumber;
+
+  // 確保有trainStops數據
+  if (!props.order.trainStops || props.order.trainStops.length === 0) {
+    stopsRef.value.events = [];
+    return;
+  }
+
+  // 找出起始站和終點站在trainStops數組中的索引
+  const departureStationName = props.order.departureStationName;
+  const arrivalStationName = props.order.arrivalStationName;
+
+  const startIndex = props.order.trainStops.findIndex(
+    (stop) => stop.stationName === departureStationName
+  );
+
+  const endIndex = props.order.trainStops.findIndex(
+    (stop) => stop.stationName === arrivalStationName
+  );
+
+  // 如果找不到站點，則顯示全部（防錯處理）
+  if (startIndex === -1 || endIndex === -1) {
+    stopsRef.value.events = props.order.trainStops.map((stop) => ({
+      stationName: stop.stationName,
+      departureTime:
+        stop.departureTime != null
+          ? stop.departureTime
+          : props.order.arrivalTime,
+    }));
+    return;
+  }
+
+  // 截取起始站到終點站之間的停靠站（包含起始站和終點站）
+  const relevantStops = props.order.trainStops.slice(startIndex, endIndex + 1);
+
+  stopsRef.value.events = relevantStops.map((stop) => ({
+    stationName: stop.stationName,
+    departureTime:
+      stop.stationName != arrivalStationName
+        ? stop.departureTime?.substring(0, 5)
+        : stop.arrivalTime?.substring(0, 5),
+    isTerminalStation:
+      stop.stationName === departureStationName ||
+      stop.stationName === arrivalStationName,
+    isDepartureStation: stop.stationName === departureStationName,
+    isArrivalStation: stop.stationName === arrivalStationName,
+  }));
+};
 
 const orderStatusFilter = {
   PENDING: "待付款",

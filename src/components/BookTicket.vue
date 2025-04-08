@@ -62,7 +62,11 @@
 
         <!-- 箭頭 -->
         <div class="col-md-auto d-flex align-items-center">
-          <i class="bi bi-arrow-right"></i>
+          <i
+            class="bi bi-arrow-left-right"
+            style="cursor: pointer"
+            @click="switchStation"
+          ></i>
         </div>
 
         <!-- 抵達站 -->
@@ -99,8 +103,8 @@
                   class="form-control"
                   name="departure-date"
                   id="departure-date"
-                  min="2025-02-16"
-                  max="2025-03-16"
+                  :min="today"
+                  :max="maxDay"
                   v-model="searchStation.trainDate"
                 />
               </div>
@@ -257,7 +261,7 @@
 import { useStationStore } from "@/stores/stationStore";
 import { useTrainsStore } from "@/stores/trainsStore";
 import Swal from "sweetalert2";
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const stationStore = useStationStore();
@@ -274,7 +278,18 @@ const fetchStations = async () => {
 
 fetchStations();
 
+const today = computed(() => {
+  return new Date().toISOString().split("T")[0];
+});
+
+const maxDay = computed(() => {
+  const date = new Date();
+  date.setDate(date.getDate() + 14);
+  return date.toISOString().split("T")[0];
+});
+
 const searchStation = reactive(trainsStore.searchParams);
+searchStation.trainDate = today.value;
 const searchMethod = ref(trainsStore.searchParams.searchMethod);
 
 const updateStationNames = () => {
@@ -328,5 +343,11 @@ const handleSearch = async () => {
       timerProgressBar: true,
     });
   }
+};
+
+const switchStation = () => {
+  const temp = searchStation.depStation;
+  searchStation.depStation = searchStation.arrStation;
+  searchStation.arrStation = temp;
 };
 </script>

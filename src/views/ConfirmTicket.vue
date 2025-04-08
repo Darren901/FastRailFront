@@ -158,14 +158,22 @@ import Stepper from "@/components/Stepper.vue";
 import TicketUserInfo from "@/components/TicketUserInfo.vue";
 import { useTrainsStore } from "@/stores/trainsStore";
 import { useOrderStore } from "@/stores/orderStore";
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
+import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
 
 const orderStore = useOrderStore();
 const trainStore = useTrainsStore();
 const { selectedTrain } = trainStore;
 
+const userStore = useUserStore();
 const router = useRouter();
+
+onMounted(() => {
+  if (!userStore.isLoggedIn) {
+    router.push("/");
+  }
+});
 
 const userInfo = reactive({
   twId: "",

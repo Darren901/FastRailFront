@@ -10,7 +10,6 @@ export const useUserStore = defineStore("user", () => {
   const login = async (email, password) => {
     try {
       const res = await UserService.login(email, password);
-      console.log(res.data);
       token.value = res.data.token;
       userId.value = res.data.userId;
       localStorage.setItem("token", token.value);
@@ -23,8 +22,7 @@ export const useUserStore = defineStore("user", () => {
 
   const register = async (data) => {
     try {
-      const res = await UserService.register(data);
-      console.log(res.data);
+      await UserService.register(data);
       return true;
     } catch (e) {
       throw e;

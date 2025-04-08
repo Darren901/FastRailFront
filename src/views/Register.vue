@@ -77,15 +77,17 @@
           <button
             class="btn"
             :class="[
-              isCountingDown ? 'btn-primary text-light' : 'btn-outline-primary',
+              otpState.isCountingDown
+                ? 'btn-primary text-light'
+                : 'btn-outline-primary',
             ]"
             @click="handleSendOtp"
-            :disabled="isCountingDown || showOtpSpinner"
+            :disabled="otpState.isCountingDown || otpState.showSpinner"
           >
             <span style="text-wrap: nowrap"
-              >{{ buttonText }}
+              >{{ otpState.buttonText }}
               <div
-                v-if="showOtpSpinner"
+                v-if="otpState.showSpinner"
                 class="spinner-border spinner-border-sm text-primary"
                 role="status"
               >
@@ -113,7 +115,7 @@
 </template>
 <script setup>
 import { useUserStore } from "@/stores/userStore";
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
 import { useRouter } from "vue-router";
 
 const register = reactive({
@@ -125,102 +127,76 @@ const register = reactive({
   otp: "",
 });
 
-const isCountingDown = ref(false);
-const countdown = ref(10); // 10秒倒計時
-const buttonText = ref("發送驗證碼");
-const showOtpSpinner = ref(false);
+const COUNTDOWN_DURATION = 60; // OTP 倒數秒數
+const otpState = reactive({
+  isCountingDown: false,
+  countdown: 0,
+  buttonText: "發送驗證碼",
+  showSpinner: false,
+});
 
 const userStore = useUserStore();
 const router = useRouter();
+
+const showToast = (icon, title) => {
+  Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon: icon,
+    iconColor: icon === "success" ? "black" : undefined,
+    title: title,
+    timer: 2500,
+    showConfirmButton: false,
+    timerProgressBar: true,
+  });
+};
 
 const handleRegister = async () => {
   try {
     const success = await userStore.register(register);
     if (success) {
       router.push("/login");
-      Swal.fire({
-        toast: true,
-        position: "top-end",
-        icon: "success",
-        iconColor: "black",
-        title: `註冊成功！`,
-        timer: 2500,
-        showConfirmButton: false,
-        timerProgressBar: true,
-      });
+      showToast("success", "註冊成功！");
     }
   } catch (e) {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "error",
-      title: e.response.data.message || "註冊失敗",
-      timer: 2500,
-      showConfirmButton: false,
-      timerProgressBar: true,
-    });
+    showToast("error", e.response?.data?.message || "註冊失敗");
   }
 };
 
 const handleSendOtp = async () => {
-  if (isCountingDown.value) return;
+  if (otpState.isCountingDown) return;
 
   if (!register.email) {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "error",
-      title: "請先填寫Email",
-      timer: 2500,
-      showConfirmButton: false,
-      timerProgressBar: true,
-    });
+    showToast("error", "請先填寫Email");
     return;
   }
 
   try {
-    showOtpSpinner.value = true;
+    otpState.showSpinner = true;
     const res = await userStore.sendOtp(register.email);
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "success",
-      iconColor: "black",
-      title: res.data.message,
-      timer: 2500,
-      showConfirmButton: false,
-      timerProgressBar: true,
-    });
+    showToast("success", res.data.message);
 
-    startCountdown();
+    startOtpCountdown();
   } catch (e) {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "error",
-      title: e.response.data.message || "傳送驗證碼發生錯誤",
-      timer: 2500,
-      showConfirmButton: false,
-      timerProgressBar: true,
-    });
+    showToast("error", e.response?.data?.message || "傳送驗證碼發生錯誤");
   } finally {
-    showOtpSpinner.value = false;
+    otpState.showSpinner = false;
   }
 };
 
-const startCountdown = () => {
-  isCountingDown.value = true;
-  countdown.value = 10;
-  buttonText.value = `已發送(${countdown.value})`;
+const startOtpCountdown = () => {
+  otpState.isCountingDown = true;
+  otpState.countdown = COUNTDOWN_DURATION;
+  otpState.buttonText = `已發送(${otpState.countdown})`;
 
   const timer = setInterval(() => {
-    countdown.value--;
-    buttonText.value = `已發送(${countdown.value})`;
+    otpState.countdown--;
+    otpState.buttonText = `已發送(${otpState.countdown})`;
 
-    if (countdown.value <= 0) {
+    if (otpState.countdown <= 0) {
       clearInterval(timer);
-      isCountingDown.value = false;
-      buttonText.value = "發送驗證碼";
+      otpState.isCountingDown = false;
+      otpState.buttonText = "發送驗證碼";
     }
   }, 1000);
 };
