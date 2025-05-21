@@ -1,4 +1,5 @@
 <template>
+  <GlobalSpinner v-if="isLoading"></GlobalSpinner>
   <Stepper :current-page="'confirm'"></Stepper>
   <div
     v-if="trainStore.selectedTrain"
@@ -154,11 +155,12 @@
 </template>
 
 <script setup>
+import GlobalSpinner from "@/components/GlobalSpinner.vue";
 import Stepper from "@/components/Stepper.vue";
 import TicketUserInfo from "@/components/TicketUserInfo.vue";
 import { useTrainsStore } from "@/stores/trainsStore";
 import { useOrderStore } from "@/stores/orderStore";
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, ref } from "vue";
 import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
 
@@ -175,6 +177,8 @@ onMounted(() => {
   }
 });
 
+const isLoading = ref(false);
+
 const userInfo = reactive({
   twId: "",
   phone: "",
@@ -183,6 +187,7 @@ const userInfo = reactive({
 
 const handleConfirm = async () => {
   try {
+    isLoading.value = true;
     const data = await orderStore.createOrder({
       userId: localStorage.getItem("userId"),
       trainNumber: selectedTrain.trainNumber,
@@ -192,19 +197,49 @@ const handleConfirm = async () => {
       arrivalTime: selectedTrain.arrTime,
       twId: userInfo.twId,
     });
+
     if (data) {
-      router.push(`/order/${data.orderNumber}`);
+      const checkStatus = async () => {
+        try {
+          const res = await orderStore.getOrderStatus(data.clientOrderId);
+          if (res.status === "SUCCESS") {
+            clearInterval(intervel);
+            isLoading.value = false;
+            router.push(`/order/${res.orderNumber}`);
+          } else if (res.status === "FAILED") {
+            clearInterval(intervel);
+            isLoading.value = false;
+            showToast("error", res.message);
+          }
+        } catch (e) {
+          clearInterval(intervel);
+          isLoading.value = false;
+          showToast("error", e.response?.data?.message || "訂位發生錯誤");
+        }
+      };
+
+      checkStatus();
+
+      // ⏱ 每 3 秒輪詢
+      const intervel = setInterval(checkStatus, 3000);
+    } else {
+      isLoading.value = false;
     }
   } catch (e) {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "error",
-      title: e.response.data.message || "訂位發生錯誤",
-      timer: 2500,
-      showConfirmButton: false,
-      timerProgressBar: true,
-    });
+    isLoading.value = false;
+    showToast("error", e.response.data.message || "訂位發生錯誤");
   }
+};
+
+const showToast = (type = "info", title = "發生錯誤") => {
+  Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon: type,
+    title,
+    timer: 2500,
+    showConfirmButton: false,
+    timerProgressBar: true,
+  });
 };
 </script>

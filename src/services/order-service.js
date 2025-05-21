@@ -29,4 +29,11 @@ export const OrderService = {
       }
     );
   },
+  getOrderStatus(clientOrderId) {
+    return axios.get(`${API_URL}/status/${clientOrderId}`, {
+      headers: {
+        Authorization: TokenService.getToken(),
+      },
+    });
+  },
 };

@@ -18,6 +18,16 @@ export const useOrderStore = defineStore("order", () => {
     }
   };
 
+  const getOrderStatus = async (clientOrderId) => {
+    try {
+      const res = await OrderService.getOrderStatus(clientOrderId);
+      return res.data;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
   const getOrderByNumber = async (orderNumber) => {
     try {
       const res = await OrderService.getOrderByNumber(orderNumber);
@@ -62,6 +72,7 @@ export const useOrderStore = defineStore("order", () => {
     createOrder,
     getOrderByNumber,
     getOrdersByUserId,
+    getOrderStatus,
     paidOrders,
     pendingOrders,
     payOrder,
