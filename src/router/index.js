@@ -2,7 +2,19 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  linkActiveClass: "active",
+  scrollBehavior() {
+    return { top: 0 };
+  },
   routes: [
+    {
+      path: "/backstage:pathMatch(.*)*",
+      component: () => import("@/views/Backstage404.vue"),
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      component: () => import("@/views/Frontstage404.vue"),
+    },
     {
       path: "/",
       name: "Index",
@@ -47,6 +59,26 @@ const router = createRouter({
       path: "/complete-profile",
       name: "CompleteProfile",
       component: () => import("@/views/CompleteProfile.vue"),
+    },
+    {
+      path: "/backstage/admin-login",
+      name: "AdminLogin",
+      component: () => import("@/views/AdminLogin.vue"),
+    },
+    {
+      path: "/backstage/home",
+      name: "BackstageHome",
+      component: () => import("@/views/BackstageHome.vue"),
+    },
+    {
+      path: "/backstage/stations",
+      name: "BackstageStations",
+      component: () => import("@/views/BackstageStations.vue"),
+    },
+    {
+      path: "/backstage/members",
+      name: "BackstageMembers",
+      component: () => import("@/views/BackstageMembers.vue"),
     },
   ],
 });

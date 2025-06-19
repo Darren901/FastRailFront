@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "./axios-instance";
 import { TokenService } from "./token-service";
 const API_URL = `${import.meta.env.VITE_API}/api/trains`;
 

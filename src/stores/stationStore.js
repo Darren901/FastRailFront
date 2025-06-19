@@ -8,9 +8,38 @@ export const useStationStore = defineStore("station", () => {
   const getStations = async () => {
     try {
       const res = await StationService.getAllStations();
-      console.log(res.data);
       stations.value = res.data;
     } catch (e) {
+      throw e;
+    }
+  };
+
+  const getStationsByPage = async (pageNumber) => {
+    try {
+      const res = await StationService.getStationByPage(pageNumber);
+      return res.data;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
+  const addStation = async (data) => {
+    try {
+      const res = await StationService.addStation(data);
+      return res.data;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
+  const deleteStation = async (id) => {
+    try {
+      const res = await StationService.deleteStation(id);
+      return res.data;
+    } catch (e) {
+      console.error(e);
       throw e;
     }
   };
@@ -18,5 +47,8 @@ export const useStationStore = defineStore("station", () => {
   return {
     getStations,
     stations,
+    getStationsByPage,
+    addStation,
+    deleteStation,
   };
 });
